@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bidderyboy Auction Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: rgb(50, 50, 167);
+      color: white;
+      font-size: 10px; 
+      padding: 7px 0;
+      text-align: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    nav {
+      background-color: rgb(50, 50, 167);
+      padding: 1px 3px;
+    }
+    nav ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    nav ul li {
+      display: inline-block;
+      margin-right: 20px;
+    }
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 15px;
+      padding-top: 5px 6px;
+      display: inline-block;
+    }
+    section {
+      padding-top: 100px;
+      padding-left: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .card-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .card {
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 20px;
+      background-color: pink;
+      width: 350px;
+      box-sizing: border-box;
+    }
+    .card img {
+      display: block;
+      margin: auto;
+      max-width: 80%;
+      height: auto;
+      border-radius: 4px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    footer {
+      background-color: rgb(50, 50, 167);
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    .card button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+    }
+    .bid-form {
+      margin-top: 10px;
+    }
+    .bid-form label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .bid-form input[type="number"] {
+      width: calc(100% - 16px);
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .countdown {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .no-products-found {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      color: red;
+    }
+    nav ul li h1,h2 {
+      color: white;
+      padding-top:3px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Welcome Bidders!</h1>
+  <nav>
+    <ul>
+      <li><a href="login.jsp" class="previous">&laquo;previous</a></li>
+      <li>
+        <form id="searchForm" th:action="@{/search}" method="get">
+          <input id="searchInput" type="text" name="search" placeholder="Search Product Category...">
+          <button type="submit">Search</button>
+        </form>
+      </li>
+      <li><a th:href="@{/logout}">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section id="view-users">
+  <div class="card-container">
+    <div th:if="${approvedProducts != null && !approvedProducts.isEmpty()}">
+      <div th:each="seller : ${approvedProducts}" class="card" th:id="'card_' + ${seller.productId}">
+        <img class="product-image" th:src="'data:image/jpeg;base64,' + ${seller.base64}" alt="">
+        <p>Seller Name: <span th:text="${seller.sellerName}"></span></p>
+        <p>Product Category: <span th:text="${seller.productCategory}"></span></p>
+        <p>Product Name: <span th:text="${seller.productName}"></span></p>
+        <p>Product Model: <span th:text="${seller.productModel}"></span></p>
+        <p>Product Condition: <span th:text="${seller.productCondition}"></span></p>
+        <p>Product Description: <span th:text="${seller.productDescription}"></span></p>
+        <p>Terms and Condition: <span th:text="${seller.terms}"></span></p>
+        <p>Bid Start Amount: <span th:text="${seller.bidStartAmount}"></span></p>
+        <p>Bid Start Date: <span th:text="${seller.startDate}"></span></p>
+        <p>Auction End Date: <span th:text="${seller.endDate}"></span></p>
+        <div class="countdown" th:id="'countdown_' + ${seller.productId}"></div>
+        
+        <div th:if="${seller.endDate != null && #dates.createNow().before(seller.endDate)} and ${seller.startDate != null && #dates.createNow().after(seller.startDate)}">
+          <button type="button" th:onclick="'toggleBidForm(' + ${seller.productName} + ')'" title="bid">Bid Now</button>
+          <form th:id="'bidForm_' + ${seller.productName}" class="bid-form" style="display: none;" th:action="@{/insertbidamount}" method="post" th:onsubmit="'return validateBidAmount(' + ${seller.bidStartAmount} + ')'">
+            <input type="hidden" name="userId" th:value="${session.userid.id}">
+            <input type="hidden" name="biddername" th:value="${session.userid.name}">
+            <input type="hidden" name="productname" th:value="${seller.productName}">
+            <label th:for="'bidAmount_' + ${seller.productName}">Enter Bid Amount:</label>
+            <input type="number" th:id="'bidAmount_' + ${seller.productName}" name="bidAmount" required th:value="${seller.bidStartAmount}" th:min="${seller.bidStartAmount}">
+            <button type="submit">Submit Bid</button>
+          </form>
+          <form th:action="@{/viewbiddersDetails}" method="post">
+            <input type="hidden" name="productname" th:value="${seller.productName}">
+            <button type="submit">View Bidders</button>
+          </form>
+          <form th:action="@{/winners}" method="post">
+            <input type="hidden" name="productname" th:value="${seller.productName}">
+            <button type="submit" disabled>View Winners</button>
+          </form>
+        </div>
+
+        <div th:if="${seller.endDate != null && #dates.createNow().after(seller.endDate)}">
+          <p>Auction ended</p>
+          <button type="button" disabled>Bid Now</button>
+          <form th:action="@{/viewbiddersDetails}" method="post">
+            <input type="hidden" name="productname" th:value="${seller.productName}">
+            <button type="submit">View Bidders</button>
+          </form>
+          <form th:action="@{/winners}" method="post">
+            <input type="hidden" name="productname" th:value="${seller.productName}">
+            <button type="submit">View Winners</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div th:if="${approvedProducts == null || approvedProducts.isEmpty()}">
+      <p>No properties have been approved yet.</p>
+    </div>
+  </div>
+  <p id="noProductsFoundMessage" class="no-products-found">No products found.</p>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const noProductsFoundMessage = document.getElementById('noProductsFoundMessage');
+
+    searchInput.addEventListener('input', function () {
+      const searchValue = searchInput.value.toLowerCase();
+      const cards = document.querySelectorAll('.card');
+      let visibleCardCount = 0;
+
+      cards.forEach(card => {
+        const productCategory = card.querySelector('p:nth-of-type(2)').textContent.toLowerCase();
+        if (productCategory.includes(searchValue)) {
+          card.style.display = '';
+          visibleCardCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (visibleCardCount === 0) {
+        noProductsFoundMessage.style.display = 'block';
+      } else {
+        noProductsFoundMessage.style.display = 'none';
+      }
+    });
+  });
+
+  function toggleBidForm(productName) {
+    var bidForm = document.getElementById("bidForm_" + productName);
+    if (bidForm.style.display === "none" || bidForm.style.display === "") {
+      bidForm.style.display = "block";
+    } else {
+      bidForm.style.display = "none";
+    }
+  }
+
+  function validateBidAmount(startingBid) {
+    var bidAmountInput = document.getElementById('bidAmount_' + productName);
+    var bidAmount = parseFloat(bidAmountInput.value);
+    var startingBidValue = parseFloat(startingBid);
+
+    if (bidAmount < startingBidValue) {
+      alert('Bid amount cannot be less than the starting bid amount: ' + startingBidValue);
+      return false;
+    }
+    return true;
+  }
+</script>
+
+</body>
+</html>

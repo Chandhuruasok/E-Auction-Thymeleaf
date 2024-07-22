@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BidderBoy Auction Website</title>
+  <style>
+   body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: rgb(50, 50, 167);
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    nav {
+      background-color: rgb(50, 50, 167);
+      color: white;
+      padding: 10px;
+    }
+
+    nav ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    nav ul li {
+      margin-bottom: 10px;
+    }
+
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    section {
+      padding-top: 100px;
+      padding-left: 20px;
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      border: 2px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 20px;
+            background-color: pink;
+            width: calc(50% - 40px); 
+            box-sizing: border-box;
+    }
+
+    .card img {
+      display: block;
+      margin: auto;
+      max-width: 80%;
+      height: auto;
+      border-radius: 4px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    footer {
+      background-color: green;
+      color: white;
+      padding-bottom: 1px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .countdown {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    header h2 {
+      color: white;
+      padding-top: 2px;
+      text-align: left;
+      padding: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>BidderBoy</h2>
+    <h1>Welcome!</h1>
+    <nav>
+      <ul>
+        <li><a th:href="@{/login}" class="previous">&laquo; Previous</a></li>
+        <li>
+          <form id="searchForm" th:action="@{/search}" method="get">
+            <input id="searchInput" type="text" th:name="search" placeholder="Search Product Category...">
+            <button type="submit">Search</button>
+          </form>
+        </li>
+        <li th:if="${session.userid != null}">
+          <a th:href="@{/logout}">Logout</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <section id="view-products">
+    <div class="card-container">
+      <div th:each="seller : ${approvedProducts}" class="card">
+        <img class="product-image" th:src="'data:image/jpeg;base64,' + ${seller.base64}" alt="">
+        <p>Name: <span th:text="${seller.sellerName}"></span></p>
+        <p>Product Category: <span th:text="${seller.productCategory}"></span></p>
+        <p>Product Name: <span th:text="${seller.productName}"></span></p>
+        <p>Product Model: <span th:text="${seller.productModel}"></span></p>
+        <p>Product Condition: <span th:text="${seller.productCondition}"></span></p>
+        <p>Product Description: <span th:text="${seller.productDescription}"></span></p>
+        <p>Terms and Condition: <span th:text="${seller.terms}"></span></p>
+        <p>Bid Start Amount: <span th:text="${seller.bidStartAmount}"></span></p>
+        <p>Bid Start Date: <span th:text="${seller.startDate}"></span></p>
+        <p>Bid End Date: <span th:text="${seller.endDate}"></span></p>
+
+        <form th:action="@{/viewbidders}" method="post" th:if="${seller.startDate != null} and ${seller.endDate != null} and ${#dates.createNow().before(seller.endDate)} and ${#dates.createNow().after(seller.startDate)}">
+          <input type="hidden" name="productname" th:value="${seller.productName}">
+          <button type="submit">View Bidders</button>
+        </form>
+
+        <div th:if="${seller.endDate != null} and ${#dates.createNow().after(seller.endDate)}">
+          <p>Auction ended</p>
+          <form th:action="@{/viewbidders}" method="post">
+            <input type="hidden" name="productname" th:value="${seller.productName}">
+            <button type="submit">View Bidders</button>
+          </form>
+          <form th:action="@{/adminViewWinners}" method="post">
+            <input type="hidden" name="productname" th:value="${seller.productName}">
+            <button type="submit">View Winners</button>
+          </form>
+        </div>
+      </div>
+      
+      <p th:if="${approvedProducts == null or #lists.isEmpty(approvedProducts)}">No properties have been approved yet.</p>
+    </div>
+  </section>
+
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', function () {
+        const searchValue = searchInput.value.toLowerCase();
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+          const productCategory = card.querySelector('p:nth-of-type(2) span').textContent.toLowerCase();
+          if (productCategory.includes(searchValue)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
