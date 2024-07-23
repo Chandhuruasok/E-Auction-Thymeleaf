@@ -1,8 +1,12 @@
 package com.chainsys.eauction.mapper;
 
 import java.sql.Blob;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import org.springframework.jdbc.core.RowMapper;
 
@@ -25,8 +29,19 @@ public class SellerMapper implements RowMapper<Sellers>{
 		sellers.setProductDescription(rs.getString("product_description"));
 		sellers.setTerms(rs.getString("terms_and_conditions"));
 		sellers.setBidStartAmount(rs.getString("bid_start_amount"));
-		sellers.setStartDate(rs.getDate("bid_start_date"));
-		
+		 Date startDate = rs.getDate("bid_start_date");
+	        Date endDate = rs.getDate("bid_end_date");
+	        
+	        if (startDate != null) {
+	            LocalDate localDate = startDate.toLocalDate();
+	            sellers.setStartDate(localDate.atStartOfDay(ZoneId.systemDefault()).toLocalDateTime());
+	        }
+	        
+	        if (endDate != null) {
+	            LocalDate localDate = endDate.toLocalDate();
+	            sellers.setEndDate(localDate.atStartOfDay(ZoneId.systemDefault()).toLocalDateTime());
+	        }
+
 		sellers.setIso(rs.getBytes("iso_certification"));
 		
 		return sellers;

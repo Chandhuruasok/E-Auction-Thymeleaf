@@ -122,6 +122,7 @@ nav ul li h2 {
   <option value="furniture">Furniture</option>
   <option value="vehicle" >Vehicle/Transportation</option>
   <option value="machineries">Machineries</option>
+  <option value="accessories">Accessories</option>
 </select>
     </div>
     <div class="form-group">
@@ -175,7 +176,7 @@ nav ul li h2 {
     </div>
   </form>
 
- <script>
+<script>
   document.getElementById('auctionForm').addEventListener('submit', function(event) {
     event.preventDefault();      
     if (validateDates()) {
@@ -197,7 +198,10 @@ nav ul li h2 {
     var startDate = new Date(startDateStr);
     var today = new Date();
 
-    if (startDateStr < today) {
+    
+   
+
+    if (startDate < today) {
       alert("Bid Start Date cannot be in the past.");
       return false;
     }
@@ -205,6 +209,7 @@ nav ul li h2 {
     return true; 
   }
 </script>
+
 
 </body>
 </html>

@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Bidderboy Auction Website</title>
+    <link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -140,9 +142,9 @@
 <nav>
     <ul>
         <li><h2>BidderBoy</h2></li>
-        <li><a th:href="@{/homePage}">Home</a></li>
-        <li><a th:href="@{/login}">Login</a></li>
-        <li><a th:href="@{/about}">About</a></li>
+        <li><a th:href="@{/homePage}"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a th:href="@{/login}"><i class="fa-solid fa-user"></i> Login</a></li>
+        <li><a th:href="@{/about}"><i class="fas fa-info-circle"></i> About</a></li>
     </ul>
 </nav>
 <a th:href="@{/homePage}" class="previous">&laquo; Previous</a>
@@ -158,23 +160,31 @@
             <label class="radio-label" for="bidder"><span>Bidder</span></label>
         </div>
         <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email"><i class="fa-solid  fa-envelope"></i> Email</label>
             <input type="email" id="email" name="email" required>
         </div>
         <div class="form-group">
-            <label for="name">User Name</label>
+            <label for="name"><i class="fa-solid fa-user"></i> User Name</label>
             <input type="text" id="name" name="name" required>
         </div>
         <div class="form-group">
-            <label for="phonenumber">Phone Number</label>
+            <label for="phonenumber"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone-fill" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"/>
+</svg> Phone Number</label>
             <input type="tel" id="phonenumber" name="phonenumber" pattern="[0-9]{10}" required>
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+</svg> Password</label>
             <input type="password" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#&]).{5,}" required>
         </div>
         <div class="form-group">
-            <label for="confirmpassword">Confirm Password</label>
+            <label for="confirmpassword"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+</svg> Confirm Password</label>
             <input type="password" id="confirmpassword" name="confirmpassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#&]).{5,}" required>
         </div>
 

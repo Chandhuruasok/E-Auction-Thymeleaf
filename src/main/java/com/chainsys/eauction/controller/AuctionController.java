@@ -1,5 +1,8 @@
 package com.chainsys.eauction.controller;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -118,26 +121,59 @@ public class AuctionController {
 
 			if (email.endsWith("@bidderboy.com")) {
 				List<Sellers> viewSellerProducts = null;
+				List<Sellers> activeProducts = new ArrayList<>();
+	            List<Sellers> endedProducts = new ArrayList<>();
+	            LocalDateTime now = LocalDateTime.now();
 				viewSellerProducts = userDao.adminViewSellerProduct();
 				for (Sellers sellers : viewSellerProducts) {
 	                String base64 = Base64.getEncoder().encodeToString(sellers.getImage());
 	                sellers.setBase64(base64);
 	                String base64Image = Base64.getEncoder().encodeToString(sellers.getIso());
 	                sellers.setBase64Image(base64Image);
+	                LocalDateTime startDateTime = sellers.getStartDate();
+			        LocalDateTime endDateTime = sellers.getEndDate();
+
+			        if (startDateTime != null && endDateTime != null) {
+			            if (now.isAfter(startDateTime) && now.isBefore(endDateTime)) {
+			                activeProducts.add(sellers);
+			            } else if (now.isAfter(endDateTime)) {
+			                endedProducts.add(sellers);
+			            }
+			        
+	            }
 	            }
 				model.addAttribute("viewSellerProducts", viewSellerProducts);
+				model.addAttribute("activeProducts", activeProducts);
+	            model.addAttribute("endedProducts", endedProducts);
 				return "admin";
 			} else if (email.endsWith("@seller.com")) {
 				return "sellerProducts";
 			} else if (email.endsWith("@gmail.com")) {
 				List<Sellers>approvedProducts=null;
 				approvedProducts=userDao.bidderViewApprovedProducts();
+				List<Sellers> activeProducts = new ArrayList<>();
+	            List<Sellers> endedProducts = new ArrayList<>();
+	            LocalDateTime now = LocalDateTime.now();
+
 				for (Sellers sellers : approvedProducts) {
-	                String base64 = Base64.getEncoder().encodeToString(sellers.getImage());
-	                sellers.setBase64(base64);
-	               
+					if (sellers.getImage() != null) {
+                        String base64 = Base64.getEncoder().encodeToString(sellers.getImage());
+                        sellers.setBase64(base64);
+                    }
+					LocalDateTime startDateTime = sellers.getStartDate();
+			        LocalDateTime endDateTime = sellers.getEndDate();
+
+			        if (startDateTime != null && endDateTime != null) {
+			            if (now.isAfter(startDateTime) && now.isBefore(endDateTime)) {
+			                activeProducts.add(sellers);
+			            } else if (now.isAfter(endDateTime)) {
+			                endedProducts.add(sellers);
+			            }
+			        }
 	            }
 				model.addAttribute("approvedProducts",approvedProducts);
+				model.addAttribute("activeProducts", activeProducts);
+	            model.addAttribute("endedProducts", endedProducts);
 				return "biddersViewProducts";
 			}
 		}
@@ -155,5 +191,43 @@ public class AuctionController {
 
 		return "login";
 
+	}
+	@GetMapping("/liveAuctions")
+	public String liveAuction(Model model)
+	{
+		List<Sellers>liveAuctions=userDao.viewLiveAuctions();
+		for (Sellers sellers : liveAuctions) {
+            String base64 = Base64.getEncoder().encodeToString(sellers.getImage());
+            sellers.setBase64(base64);
+            
+        }
+		model.addAttribute("liveAuctions", liveAuctions);
+		return "liveAuctions";
+		
+	}
+	@GetMapping("/endedAuctions")
+	public String endedAuction(Model model)
+	{
+		List<Sellers>endedAuctions=userDao.viewEndedAuctions();
+		for (Sellers sellers : endedAuctions) {
+            String base64 = Base64.getEncoder().encodeToString(sellers.getImage());
+            sellers.setBase64(base64);
+            
+        }
+		model.addAttribute("endedAuctions", endedAuctions);
+		return "endedAuctions";
+	}
+	@GetMapping("/upComingAuctions")
+	public String upComingAuction(Model model)
+	{
+		List<Sellers>upComingAuctions=userDao.viewUpComingAuctions();
+		for(Sellers sellers:upComingAuctions)
+		{
+			String base64 = Base64.getEncoder().encodeToString(sellers.getImage());
+            sellers.setBase64(base64);
+			
+		}
+		model.addAttribute("upComingAuctions", upComingAuctions);
+		return "upComingAuctions";
 	}
 }

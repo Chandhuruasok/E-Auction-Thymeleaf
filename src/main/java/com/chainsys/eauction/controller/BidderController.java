@@ -1,4 +1,5 @@
 package com.chainsys.eauction.controller;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.chainsys.eauction.dao.UserDAO;
 import com.chainsys.eauction.model.Bidders;
 import com.chainsys.eauction.model.Transactions;
+import com.chainsys.eauction.model.Users;
 import com.chainsys.eauction.util.EmailUtility;
 import com.chainsys.eauction.validation.Validation;
+
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class BidderController {
 	@Autowired
@@ -24,9 +29,11 @@ public class BidderController {
 	EmailUtility emailUtility;
 	@Autowired
 	Validation validation;
+
 	@PostMapping("/insertbidamount")
-	public String insertBidAmount(@RequestParam("userId") int BidderId,@RequestParam("biddername") String bidderName,@RequestParam("productname") String productName,@RequestParam("bidAmount") int bidAmount) throws ClassNotFoundException
-	{
+	public String insertBidAmount(@RequestParam("userId") int BidderId, @RequestParam("biddername") String bidderName,
+			@RequestParam("productname") String productName, @RequestParam("bidAmount") int bidAmount)
+			throws ClassNotFoundException {
 		bidders.setUserId(BidderId);
 		bidders.setBidderName(bidderName);
 		bidders.setProductName(productName);
@@ -34,32 +41,34 @@ public class BidderController {
 		user.insertBidAmount(bidders);
 		return "biddersViewProducts";
 	}
-	@PostMapping("/viewbiddersDetails")
-	public String viewBiddersDetails(@RequestParam("productname") String productName,Model model)
-	{
-		  List<Bidders>bidders=null;
-		  bidders=user.viewBidders(productName);
-		  model.addAttribute("bidders", bidders);
-		  
-	      return "viewBidders";
-	}
-	@PostMapping("/winners")
-	public String biddersViewWinners(@RequestParam("productname") String productName,Model model)
-	{
-		List<Bidders>winners=null;
-		winners=user.biddersViewWinners(productName);
-		  model.addAttribute("winners", winners);
-		  boolean isWinner = (userId.getId() == bidders.getUserId());
-			boolean isPaid = user.isPaid(bidderId, productName);
 
-		  
-		  
-	      return "biddersViewWinners";
+	@PostMapping("/viewbiddersDetails")
+	public String viewBiddersDetails(@RequestParam("productname") String productName, Model model) {
+		List<Bidders> bidders = null;
+		bidders = user.viewBidders(productName);
+		model.addAttribute("bidders", bidders);
+
+		return "viewBidders";
 	}
+
+	@PostMapping("/winners")
+	public String biddersViewWinners(@RequestParam("productname") String productName, Model model,
+			HttpSession session) {
+		List<Bidders> winners = null;
+		winners = user.biddersViewWinners(productName);
+		model.addAttribute("winners", winners);
+		Users users = (Users) session.getAttribute("userid");
+		boolean isWinner = (users.getId() == bidders.getUserId());
+		model.addAttribute("isWinner",isWinner);
+		boolean isPaid = user.isPaid(users.getId(), productName);
+		model.addAttribute("isPaid", isPaid);
+		return "biddersViewWinners";
+	}
+
 	@PostMapping("/payment")
-	public String bidderPayment(@RequestParam("userId") int bidderId,@RequestParam("biddername") String bidderName,@RequestParam("productname") String productName,@RequestParam("amount") int payableAmount,Model model)
-	{
-		
+	public String bidderPayment(@RequestParam("userId") int bidderId, @RequestParam("biddername") String bidderName,
+			@RequestParam("productname") String productName, @RequestParam("amount") int payableAmount, Model model) {
+
 		transactions.setBidderId(bidderId);
 		transactions.setBidderName(bidderName);
 		transactions.setProductName(productName);
@@ -67,15 +76,15 @@ public class BidderController {
 		user.bidderPayment(transactions);
 		user.successPayment(bidderId);
 		model.addAttribute("productName", productName);
-		
+
 		String mail = user.sendEmailToWinner(bidderId);
-        String subject=" Important Notice: Regarding Your Recent Participation in Auction Management in Bidderboy";
-        String body="Thank you for your interest in BidderBoy.You are the winner of the auction that you have participated"+ 
-                
-                "\r\n"
-                + "Best regards, ";
-        emailUtility.sendEmail(mail, subject, body);
-	      return "biddersViewWinners";
-		
+		String subject = " Important Notice: Regarding Your Recent Participation in Auction Management in Bidderboy";
+		String body = "Thank you for your interest in BidderBoy.You are the winner of the auction that you have participated"
+				+
+
+				"\r\n" + "Best regards, ";
+		emailUtility.sendEmail(mail, subject, body);
+		return "biddersViewWinners";
+
 	}
 }

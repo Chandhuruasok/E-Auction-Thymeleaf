@@ -1,6 +1,7 @@
 package com.chainsys.eauction.model;
 
-import java.sql.Date;
+
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import org.springframework.stereotype.Repository;
@@ -21,8 +22,8 @@ public class Sellers {
 	byte[] iso;
 	String bidStartAmount;
 	int productId;
-	Date startDate;
-	Date endDate;
+	LocalDateTime startDate;
+	LocalDateTime endDate;
 	String base64;
 	String base64Image;
 	public int getSellerId() {
@@ -99,16 +100,16 @@ public class Sellers {
 	public void setProductId(int productId) {
 		this.productId = productId;
 	}
-	public Date getStartDate() {
+	public LocalDateTime getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(Date date) {
-		this.startDate = date;
+	public void setStartDate(LocalDateTime localDateTime) {
+		this.startDate = localDateTime;
 	}
-	public Date getEndDate() {
+	public LocalDateTime getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(Date endDate) {
+	public void setEndDate(LocalDateTime endDate) {
 		this.endDate = endDate;
 	}
 	
@@ -131,7 +132,7 @@ public class Sellers {
 	
 	public Sellers(int sellerId, String sellerName, String productName, String productModel, String productCategory,
 			String productCondition, String productDescription, String terms, byte[] image, byte[] iso,
-			String bidStartAmount, int productId, Date startDate, Date endDate, String base64, String base64Image) {
+			String bidStartAmount, int productId, LocalDateTime startDate, LocalDateTime endDate, String base64, String base64Image) {
 		super();
 		this.sellerId = sellerId;
 		SellerName = sellerName;

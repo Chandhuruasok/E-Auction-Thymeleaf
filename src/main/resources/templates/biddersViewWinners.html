@@ -1,178 +1,184 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bidderyboy Auction Website - View Winners</title>
-    <style>
-        body {
-            background-image: url('images/winner image.jpg');
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bidderyboy Auction Website - View Winners</title>
+<style>
+body {
+	background-image: url('images/winner image.jpg');
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-size: cover;
+	background-position: center;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
 
-        header {
-            background-color: rgb(50, 50, 167);
-            color: white;
-            padding: 1px;
-            text-align: center;
-        }
+header {
+	background-color: rgb(50, 50, 167);
+	color: white;
+	padding: 1px;
+	text-align: center;
+}
 
-        h1 {
-            margin: 0;
-            font-size: 24px;
-            padding: -50px;
-        }
+h1 {
+	margin: 0;
+	font-size: 24px;
+	padding: -50px;
+}
 
-        nav {
-            background-color: rgb(50, 50, 167);
-            color: white;
-            padding: 8px;
-            min-height: 7px;
-        }
+nav {
+	background-color: rgb(50, 50, 167);
+	color: white;
+	padding: 8px;
+	min-height: 7px;
+}
 
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
+nav ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
 
-        nav ul li {
-            margin-bottom: 10px;
-        }
+nav ul li {
+	margin-bottom: 10px;
+}
 
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-        }
+nav ul li a {
+	color: white;
+	text-decoration: none;
+	font-size: 16px;
+}
 
-        section {
-            padding: 20px;
-            flex-grow: 1;
-        }
+section {
+	padding: 20px;
+	flex-grow: 1;
+}
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            background-color: white;
-            border-radius: 5px;
-            overflow: hidden;
-        }
+table {
+	border-collapse: collapse;
+	width: 100%;
+	background-color: white;
+	border-radius: 5px;
+	overflow: hidden;
+}
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
+th, td {
+	border: 1px solid #ddd;
+	padding: 10px;
+	text-align: left;
+}
 
-        .form-container {
-            display: none;
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
+.form-container {
+	display: none;
+	background-color: #f9f9f9;
+	padding: 20px;
+	border-radius: 5px;
+	margin-top: 10px;
+}
 
-        .form-container input {
-            width: calc(100% - 16px);
-            padding: 8px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
+.form-container input {
+	width: calc(100% - 16px);
+	padding: 8px;
+	margin-bottom: 10px;
+	box-sizing: border-box;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+}
 
-        .form-container button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-        }
+.form-container button {
+	width: 100%;
+	padding: 8px;
+	margin-top: 10px;
+}
 
-        header h2 {
-            color: white;
-            text-align: left;
-            padding: 10px;
-        }
-    </style>
+header h2 {
+	color: white;
+	text-align: left;
+	padding: 10px;
+}
+</style>
 </head>
 <body>
-<header>
-    <h2>BidderBoy</h2>
-    <h1>Winner</h1>
-    <nav>
-        <ul>
-            <li><a href="biddersViewProducts" class="previous">&laquo;previous</a></li>
-        </ul>
-</header>
-<section id="view-users">
-    <table>
-        <thead>
-            <tr>
-                <th>Bidder Name</th>
-                <th>Product Name</th>
-                <th>Bid Amount</th>
-                <th>Payment</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="bidder : ${winners}">
-                <td th:text="${bidder.bidderName}"></td>
-                <td th:text="${bidder.productName}"></td>
-                <td th:text="${bidder.bidAmount}"></td>
-                <td>
-                    <div th:if="${bidder.winner}">
-                        <div th:if="${!bidder.paid}">
-                            <button th:id="'payButton_' + ${bidder.bidderName}"
-                                    th:onclick="'showPaymentForm(\'' + ${bidder.bidderName} + '\')'">Pay</button>
-                            <div th:id="'paymentForm_' + ${bidder.bidderName}" class="form-container">
-                                <form th:action="@{/payment}" method="post" th:id="'payForm_' + ${bidder.bidderName}">
-                                    <label for="accountNumber">Account Number:</label>
-                                    <input type="text" th:id="'accountNumber_' + ${bidder.bidderName}"
-                                           name="accountNumber" placeholder="Enter the 16 digits number"
-                                           pattern="[0-9]{16}" required>
-                                    <label for="cvvNumber">CVV Number:</label>
-                                    <input type="text" th:id="'cvvNumber_' + ${bidder.bidderName}" name="cvvnumber"
-                                           placeholder="Enter the 3 digits number" pattern="[0-9]{3}" required>
-                                    <label for="expiryDate">Expiry Date:</label>
-                                    <input type="text" th:id="'expiryDate_' + ${bidder.bidderName}" name="expirydate"
-                                           placeholder="YYYY/MM" required>
-                                    <input type="hidden" th:id="'bidderName_' + ${bidder.bidderName}"
-                                           name="biddername" th:value="${bidder.bidderName}">
-                                    <input type="hidden" th:id="'productName_' + ${bidder.productName}"
-                                           name="productname" th:value="${bidder.productName}">
-                                    <label for="amount">Payable Amount:</label>
-                                    <input type="text" name="amount" th:value="${bidder.bidAmount}" readonly>
-                                    <input type="hidden" name="userId" th:value="${session.userid.id}">
-                                    <button type="submit">Pay Now</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</section>
-<script>
-    function showPaymentForm(bidderName) {
-        var paymentForm = document.getElementById('paymentForm_' + bidderName);
-        var payButton = document.getElementById('payButton_' + bidderName);
+	<header>
+		<h2>BidderBoy</h2>
+		<h1>Winner</h1>
+		<nav>
+			<ul>
+				<li><a href="biddersViewProducts" class="previous">&laquo;previous</a></li>
+			</ul>
+	</header>
+	<section id="view-users">
+		<table>
+			<thead>
+				<tr>
+					<th>Bidder Name</th>
+					<th>Product Name</th>
+					<th>Bid Amount</th>
+					<th>Payment</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="bidder : ${winners}">
+					<td th:text="${bidder.bidderName}"></td>
+					<td th:text="${bidder.productName}"></td>
+					<td th:text="${bidder.bidAmount}"></td>
+					<td>
+						<div th:if="${isWinner}">
+							<div th:if="${!isPaid}">
+								<button th:id="'payButton_' + ${bidder.bidderName}"
+									th:onclick="'showPaymentForm(\'' + ${bidder.bidderName} + '\')'">Pay</button>
+								<div th:id="'paymentForm_' + ${bidder.bidderName}"
+									class="form-container">
+									<form th:action="@{/payment}" method="post"
+										th:id="'payForm_' + ${bidder.bidderName}">
+										<label for="accountNumber">Account Number:</label> <input
+											type="text" th:id="'accountNumber_' + ${bidder.bidderName}"
+											name="accountNumber" placeholder="Enter the 16 digits number"
+											pattern="[0-9]{16}" required> <label for="cvvNumber">CVV
+											Number:</label> <input type="text"
+											th:id="'cvvNumber_' + ${bidder.bidderName}" name="cvvnumber"
+											placeholder="Enter the 3 digits number" pattern="[0-9]{3}"
+											required> <label for="expiryDate">Expiry
+											Date:</label> <input type="text"
+											th:id="'expiryDate_' + ${bidder.bidderName}"
+											name="expirydate" placeholder="YYYY/MM" required> <input
+											type="hidden" th:id="'bidderName_' + ${bidder.bidderName}"
+											name="biddername" th:value="${bidder.bidderName}"> <input
+											type="hidden" th:id="'productName_' + ${bidder.productName}"
+											name="productname" th:value="${bidder.productName}">
+										<label for="amount">Payable Amount:</label> <input type="text"
+											name="amount" th:value="${bidder.bidAmount}" readonly>
+										<input type="hidden" name="userId"
+											th:value="${session.userid.id}">
+										<button type="submit">Pay Now</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+	<script>
+		function showPaymentForm(bidderName) {
+			var paymentForm = document.getElementById('paymentForm_'
+					+ bidderName);
+			var payButton = document.getElementById('payButton_' + bidderName);
 
-        if (paymentForm.style.display === 'none' || paymentForm.style.display === '') {
-            paymentForm.style.display = 'block';
-        } else {
-            paymentForm.style.display = 'none';
-        }
+			if (paymentForm.style.display === 'none'
+					|| paymentForm.style.display === '') {
+				paymentForm.style.display = 'block';
+			} else {
+				paymentForm.style.display = 'none';
+			}
 
-        payButton.style.display = 'none';
-    }
-</script>
+			payButton.style.display = 'none';
+		}
+	</script>
 </body>
 </html>

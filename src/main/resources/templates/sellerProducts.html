@@ -103,7 +103,7 @@
     <form id="auctionForm" th:action="@{/sellerproduct}" method="post" enctype="multipart/form-data">
         <div class="form-group">
             <label for="name">Seller Name:</label>
-            <input type="hidden" id="name" name="username" th:value="${session.userid.id}" readonly>
+            <input type="text" id="name" name="username" th:value="${session.userid.name}" readonly>
         </div>
         <div class="form-group">
             <label for="product_category">Product Category:</label>
@@ -112,6 +112,7 @@
                 <option value="furniture">Furniture</option>
                 <option value="vehicle">Vehicle/Transportation</option>
                 <option value="machineries">Machineries</option>
+                 <option value="accessories">Accessories</option>
             </select>
         </div>
         <div class="form-group">
@@ -163,34 +164,37 @@
 </div>
 
 <script>
-    document.getElementById('auctionForm').addEventListener('submit', function(event) {
-        event.preventDefault();      
-        if (validateDates()) {
-            alert("Product submitted successfully!");
-            this.submit(); 
-        } else {
-            alert("Please check the dates and try again."); 
-        }
-    });
-
-    function validateDates() {
-        var startDateStr = document.getElementById('bid_start_date').value;
-
-        if (!startDateStr) {
-            alert("Please enter a valid Bid Start Date.");
-            return false;
-        }
-
-        var startDate = new Date(startDateStr);
-        var today = new Date();
-
-        if (startDate < today) {
-            alert("Bid Start Date cannot be in the past.");
-            return false;
-        }
-
-        return true; 
+document.getElementById('auctionForm').addEventListener('submit', function(event) {
+    event.preventDefault();      
+    if (validateDates()) {
+      alert("Product submitted successfully!");
+      this.submit(); 
+    } else {
+      alert("Please check the dates and try again."); 
     }
+  });
+function validateDates() {
+    var startDateStr = document.getElementById('bid_start_date').value;
+
+    if (!startDateStr) {
+        alert("Please enter a valid Bid Start Date.");
+        return false;
+    }
+
+    var startDate = new Date(startDateStr);
+    var today = new Date();
+    
+    
+    startDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    if (startDate < today) {
+        alert("Bid Start Date must be today or a future date.");
+        return false;
+    }
+
+    return true; 
+}
 </script>
 
 </body>

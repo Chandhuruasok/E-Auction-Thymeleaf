@@ -2,6 +2,7 @@ package com.chainsys.eauction.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import org.springframework.jdbc.core.RowMapper;
 import com.chainsys.eauction.model.Sellers;
@@ -20,8 +21,17 @@ public class BidderMapper implements RowMapper<Sellers> {
 		sellers.setProductDescription(rs.getString("product_description"));
 		sellers.setTerms(rs.getString("terms_and_conditions"));
 		sellers.setBidStartAmount(rs.getString("bid_start_amount"));
-		sellers.setStartDate(rs.getDate("bid_start_date"));
-		sellers.setEndDate(rs.getDate("bid_end_date"));
+		java.sql.Date sqlStartDate = rs.getDate("bid_start_date");
+        if (sqlStartDate != null) {
+            LocalDate startDate = sqlStartDate.toLocalDate();
+            sellers.setStartDate(startDate.atStartOfDay());
+        }
+
+        java.sql.Date sqlEndDate = rs.getDate("bid_end_date");
+        if (sqlEndDate != null) {
+            LocalDate endDate = sqlEndDate.toLocalDate();
+            sellers.setEndDate(endDate.atStartOfDay());
+        }
 		
 		return sellers;
 	}

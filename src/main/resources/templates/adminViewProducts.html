@@ -52,18 +52,18 @@
     .card-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 50px;
       justify-content: center;
     }
 
     .card {
       border: 2px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 20px;
-            background-color: pink;
-            width: calc(50% - 40px); 
-            box-sizing: border-box;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 20px;
+      background-color: pink;
+      width: 350px; 
+      box-sizing: border-box;
     }
 
     .card img {
@@ -106,6 +106,17 @@
       text-align: left;
       padding: 4px;
     }
+
+    .countdown {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .auction-ended {
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -131,7 +142,7 @@
     <div class="card-container">
       <div th:each="seller : ${approvedProducts}" class="card">
         <img class="product-image" th:src="'data:image/jpeg;base64,' + ${seller.base64}" alt="">
-        <p>Name: <span th:text="${seller.sellerName}"></span></p>
+        <p>Seller Name: <span th:text="${seller.sellerName}"></span></p>
         <p>Product Category: <span th:text="${seller.productCategory}"></span></p>
         <p>Product Name: <span th:text="${seller.productName}"></span></p>
         <p>Product Model: <span th:text="${seller.productModel}"></span></p>
@@ -142,22 +153,17 @@
         <p>Bid Start Date: <span th:text="${seller.startDate}"></span></p>
         <p>Bid End Date: <span th:text="${seller.endDate}"></span></p>
 
-        <form th:action="@{/viewbidders}" method="post" th:if="${seller.startDate != null} and ${seller.endDate != null} and ${#dates.createNow().before(seller.endDate)} and ${#dates.createNow().after(seller.startDate)}">
+        <div class="countdown" th:id="'countdown_' + ${seller.productName}"></div>
+
+        <form th:action="@{/viewbidders}" method="post">
           <input type="hidden" name="productname" th:value="${seller.productName}">
-          <button type="submit">View Bidders</button>
+          <button type="submit" class="view-bidders-btn">View Bidders</button>
         </form>
 
-        <div th:if="${seller.endDate != null} and ${#dates.createNow().after(seller.endDate)}">
-          <p>Auction ended</p>
-          <form th:action="@{/viewbidders}" method="post">
-            <input type="hidden" name="productname" th:value="${seller.productName}">
-            <button type="submit">View Bidders</button>
-          </form>
-          <form th:action="@{/adminViewWinners}" method="post">
-            <input type="hidden" name="productname" th:value="${seller.productName}">
-            <button type="submit">View Winners</button>
-          </form>
-        </div>
+        <form th:action="@{/adminViewWinners}" method="post">
+          <input type="hidden" name="productname" th:value="${seller.productName}">
+          <button type="submit" class="view-winners-btn" disabled>View Winners</button>
+        </form>
       </div>
       
       <p th:if="${approvedProducts == null or #lists.isEmpty(approvedProducts)}">No properties have been approved yet.</p>
@@ -178,6 +184,63 @@
             card.style.display = 'none';
           }
         });
+      });
+
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        const startDateElement = card.querySelector('p:nth-of-type(9) span');
+        const endDateElement = card.querySelector('p:nth-of-type(10) span');
+        const countdownElement = card.querySelector('.countdown');
+        const viewBiddersBtn = card.querySelector('.view-bidders-btn');
+        const viewWinnersBtn = card.querySelector('.view-winners-btn');
+        
+        if (startDateElement && endDateElement && countdownElement) {
+          const startDate = new Date(startDateElement.textContent);
+          const endDate = new Date(endDateElement.textContent);
+          
+          function updateCountdown() {
+            const now = new Date();
+            let difference;
+            let countdownText;
+
+            if (now < startDate) {
+              difference = startDate - now;
+              countdownText = "Auction starts in: ";
+              viewBiddersBtn.disabled = true;
+              viewWinnersBtn.disabled = true;
+            } else if (now >= startDate && now <= endDate) {
+              difference = endDate - now;
+              countdownText = "Auction ends in: ";
+              viewBiddersBtn.disabled = false;
+              viewWinnersBtn.disabled = true;
+            } else {
+              countdownElement.textContent = "Auction has ended";
+              viewBiddersBtn.disabled = false;
+              viewWinnersBtn.disabled = false;
+              return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            countdownElement.textContent = `${countdownText}${days}d ${hours}h ${minutes}m ${seconds}s`;
+          }
+
+          updateCountdown();
+          const countdownInterval = setInterval(updateCountdown, 1000);
+
+          const totalDuration = endDate - new Date();
+          if (totalDuration > 0) {
+            setTimeout(() => {
+              clearInterval(countdownInterval);
+              countdownElement.textContent = "Auction has ended";
+              viewBiddersBtn.disabled = false;
+              viewWinnersBtn.disabled = false;
+            }, totalDuration);
+          }
+        }
       });
     });
   </script>

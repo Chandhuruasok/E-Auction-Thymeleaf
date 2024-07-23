@@ -71,11 +71,12 @@ padding-top:-40px;
 
     .card {
       border: 2px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 20px;
-      background-color: pink;
-      width: 350px;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 20px;
+            background-color: pink;
+            width: 350px; 
+            box-sizing: border-box;
     }
 
     .card img {

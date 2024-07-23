@@ -3,6 +3,7 @@ package com.chainsys.eauction.controller;
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,7 @@ public class SellerController {
 	UserDAO user;
 	
 @PostMapping("/sellerproduct")
-public String insertProducts(@RequestParam("id") int sellerId,@RequestParam("username") String sellerName,@RequestParam("product_category") String productCategory,@RequestParam("product_name")String productName,@RequestParam("image") MultipartFile image,@RequestParam("product_model") String productModel,@RequestParam("product_condition") String productCondition,@RequestParam("product_description") String productDescription,@RequestParam("terms_and_conditions") String termsAndConditions,@RequestParam("average_amount") String bidStartAmount,@RequestParam("bid_start_date") Date bidStartDate,@RequestParam("myfile") MultipartFile isoCertificate)
+public String insertProducts(@RequestParam("id") int sellerId,@RequestParam("username") String sellerName,@RequestParam("product_category") String productCategory,@RequestParam("product_name")String productName,@RequestParam("image") MultipartFile image,@RequestParam("product_model") String productModel,@RequestParam("product_condition") String productCondition,@RequestParam("product_description") String productDescription,@RequestParam("terms_and_conditions") String termsAndConditions,@RequestParam("average_amount") String bidStartAmount,@RequestParam("bid_start_date") LocalDateTime bidStartDate,@RequestParam("myfile") MultipartFile isoCertificate)
 {
 	Sellers sellers=new Sellers();
 	sellers.setSellerId(sellerId);
@@ -54,10 +55,16 @@ public String insertProducts(@RequestParam("id") int sellerId,@RequestParam("use
 	sellers.setProductDescription(productDescription);
 	sellers.setTerms(termsAndConditions);
 	sellers.setBidStartAmount(bidStartAmount);
-	sellers.setStartDate(bidStartDate);
-	LocalDate startDate = bidStartDate.toLocalDate();
-    LocalDate endDate = startDate.plusDays(1);
-    sellers.setEndDate(Date.valueOf(endDate));
+	 if (bidStartDate != null) {
+	        sellers.setStartDate(bidStartDate);
+	    }
+
+
+	    if (bidStartDate != null) {
+	        LocalDate endDate = bidStartDate.toLocalDate().plusDays(2);
+	        sellers.setEndDate(endDate.atStartOfDay());
+	    }
+
 	sellers.setIso(isoBytes);
 	user.insertSellerProducts(sellers);
 	return "sellerProducts";
